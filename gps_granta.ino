@@ -49,14 +49,12 @@ SoftwareSerial SerialGPS(D5, D0);
 SoftwareSerial SerialGSM(D2, D3); 
 ESP8266WebServer server(80);
 
-//char* ssid1 = "Dom";
-//char* pass1 = "Rozov0732";
-//char* ssid = "Zenfone Max Pro";
-//char* pass = "123456777";
+//char* ssid1 = "xxx";
+//char* pass1 = "xxx";
+//char* ssid = "yyy";
+//char* pass = "yyy";
 //const char APN[] = "Internet.tele2.ru";
 //const char URL[] = "https://postman-echo.com/get?foo1=bar1&foo2=bar2";
-//const char URL[]="http://217.25.227.150:8265/gps.php?latitude=51.2568&longitude=39.5896&speed=25&altitude=18.2&battlevel=71&tm=1628589452101&deviceid=Granta";
-const char URL[]="https://api.telegram.org/bot583018390:AAE8qo6M_D-kPv8ICKffeQxXdneXWs5ivO8/sendmessage?chat_id=407427903&text=test";
 
 //#define UDP_PORT 555;
 
@@ -96,8 +94,8 @@ void setup()
   Serial.println("Initializing...");    // Печать текста
   delay(5000); 
   WiFi.mode(WIFI_STA);
-  wifiMulti.addAP("Dom", "Rozov0732");
-  wifiMulti.addAP("Zenfone Max Pro", "123456777");
+  wifiMulti.addAP("xxx", "xxx");
+  wifiMulti.addAP("xxx", "xxx");
   ArduinoOTA.setHostname("GPS_Moyak");
   ArduinoOTA.begin();
   WiFi.hostname("GSM_Moyak");  
@@ -141,13 +139,13 @@ void setup()
   {
     if (wificon)
     {
-      ssid = "Zenfone Max Pro";
-      pass = "123456777";
+      ssid = "xxx";
+      pass = "xxx";
     }
     else  
     {
-      ssid = "Dom";
-      pass = "Rozov0732";
+      ssid = "xxx";
+      pass = "xxx";
     }
     Serial.print("Connecting to ");
     Serial.print(ssid);
@@ -209,41 +207,6 @@ void loop()
   }
   
 
-  /*if (wificount > 2000)
-  {
-    if (WiFi.status() != WL_CONNECTED) 
-    {
-      if (wificon)
-      {
-        ssid = "Zenfone Max Pro";
-        pass = "123456777";
-      }
-      else  
-      {
-        ssid = "Dom";
-        pass = "Rozov0732";
-      }  
-      Serial.print("Connecting to ");
-      Serial.print(ssid);
-      Serial.println("...");
-      //logger.print("Connecting to ");
-      //logger.println(ssid);
-      WiFi.begin(ssid, pass);
-      //ArduinoOTA.setHostname("GPS_Moyak");
-      //ArduinoOTA.begin();
-      wificon=!wificon;
-    }
-    if (WiFi.status() == WL_CONNECTED)
-    {
-      ArduinoOTA.setHostname("GPS_Moyak");
-      ArduinoOTA.begin();
-    }
-    wificount=0;
-  }
-  else
-  {
-    wificount+=1;
-  }*/
   //DEBUG_WPRINTLN(F("*****************************************"));
 
   // show var
@@ -792,22 +755,10 @@ void senddata(String lat, String lon, String speed, String tochnost)
   delay(1000);
   logger.println("!!!!!!!Sent data!!!!!!!!");
   logger.print("Location valid ");logger.println(gps.location.isValid());
-  SerialGSM.println("AT+SAPBR=1,1");         
-  //updateSerial();
-  delay(1000);
-  SerialGSM.println("AT+CIPSTART=\"UDP\",\"217.25.227.150\",\"555\"");
+  SerialGSM.println("AT+SAPBR=1,1");
   updateSerial();
   delay(1000);
-  SerialGSM.println("AT+CIPSEND=11");
-  updateSerial();
-  delay(1000);
-  SerialGSM.println("phone/check");
-  updateSerial();
-  delay(1000);
-  SerialGSM.println("AT+CIPCLOSE");
-  updateSerial();
-  delay(1000);
-  SerialGSM.println("AT+CIPSTART=\"TCP\",\"217.25.227.150\",\"8265\"");
+  SerialGSM.println("AT+CIPSTART=\"TCP\",\"0.0.0.0\",\"80\"");
   updateSerial();
   while (SerialGSM.available()==0)
   {
@@ -834,7 +785,7 @@ void senddata(String lat, String lon, String speed, String tochnost)
   //updateSerial();
   SerialGSM.print(tochnost);
   //updateSerial();
-  SerialGSM.print(" HTTP/1.1\r\nHost: 217.25.227.150:8265\r\n\r\n");
+  SerialGSM.print(" HTTP/1.1\r\nHost: 0.0.0.0:80\r\n\r\n");
   updateSerial();
   delay(1500);
   SerialGSM.println((char)26);
@@ -876,25 +827,11 @@ void senddatagsm(String data1, String speed1)
   SerialGSM.println("AT+SAPBR=1,1");         
   delay(5000);
   updateSerial();
-  delay(1000);
-  SerialGSM.println("AT+CIPSTART=\"UDP\",\"217.25.227.150\",\"555\"");
-  updateSerial();
-  delay(2000);
-  updateSerial();
-  delay(1000);
-  SerialGSM.println("AT+CIPSEND=11");
-  updateSerial();
-  delay(1000);
-  SerialGSM.println("phone/check");
-  updateSerial();
-  delay(1000);
-  SerialGSM.println("AT+CIPCLOSE");
-  updateSerial();
 
   /*SerialGSM.println( "AT+SAPBR=2,1" );
   SerialGSM.println( "AT+HTTPINIT" );
   SerialGSM.println( "AT+HTTPPARA=CID,1" );
-  SerialGSM.println( "AT+HTTPPARA=URL,http://217.25.227.150:8265/gpsgsm.php?gsmdata="  + data + "&speed=" + speed + "&deviceid=granta&battlevel=100");
+  SerialGSM.println( "AT+HTTPPARA=URL,http://0.0.0.0:80/gpsgsm.php?gsmdata="  + data + "&speed=" + speed + "&deviceid=granta&battlevel=100");
   updateSerial();
   SerialGSM.println( "AT+HTTPPARA=CONTENT,application/x-www-form-urlencoded" );
   updateSerial();
@@ -918,7 +855,7 @@ int part=data1.length()/7;
   Serial.println(data1.substring(part*5,part*6));
   Serial.println(data1.substring(part*6));
   delay(1000);
-  SerialGSM.println("AT+CIPSTART=\"TCP\",\"217.25.227.150\",\"8265\"");
+  SerialGSM.println("AT+CIPSTART=\"TCP\",\"0.0.0.0\",\"80\"");
   //updateSerial();
   while (SerialGSM.available()==0)
   {
@@ -944,7 +881,7 @@ int part=data1.length()/7;
     else if (GSMdata.startsWith("ERROR"))
     {
       Serial.println("Ошибка");
-      SerialGSM.println("AT+CIPSTART=\"TCP\",\"217.25.227.150\",\"8265\"");
+      SerialGSM.println("AT+CIPSTART=\"TCP\",\"0.0.0.0\",\"80\"");
     }
   }
   updateSerial();
@@ -1002,7 +939,7 @@ int part=data1.length()/7;
   SerialGSM.print("&deviceid=granta&battlevel=100");
   delay(100);
   updateSerial();
-  SerialGSM.print(" HTTP/1.1\r\nHost: 217.25.227.150:8265\r\n\r\n");
+  SerialGSM.print(" HTTP/1.1\r\nHost: 0.0.0.0:80\r\n\r\n");
   delay(100);
   updateSerial();
   delay(1500);
@@ -1023,7 +960,7 @@ int part=data1.length()/7;
     else if (GSMdata.startsWith("ERROR"))
     {
       Serial.println("Ошибка");
-      SerialGSM.println("AT+CIPSTART=\"TCP\",\"217.25.227.150\",\"8265\"");
+      SerialGSM.println("AT+CIPSTART=\"TCP\",\"0.0.0.0\",\"80\"");
     }
   }
   //delay(1000);
